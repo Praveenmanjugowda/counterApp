@@ -14,6 +14,8 @@ counterCntlr.list = (req,res)=>{
 
 counterCntlr.create = (req,res)=>{
     const counter = new Counter()
+    Counter.count + 1
+    console.log(counter)
     counter.save()
          .then((counter)=>{
             res.json(counter)
