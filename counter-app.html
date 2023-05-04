@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+           CounterApp
+        </title>
+    </head>
+    <body>
+        <div id="root">
+
+        </div>
+
+        <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+        <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.js"></script>
+       
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.js" integrity="sha512-A/D/17S8jG62ka9f3jPwMs+bKGJ1f/xQts7bAUjTIKQf0anTGjlpuEz3q9q++3qRAVYKS3iVx6KzM8GPtIaYfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <script type="text/babel">
+           const rootHandle = document.getElementById('root')
+           const {useState , useEffect} = React
+           const App = (props)=>{
+
+            const [counters, setCounters] = useState([])
+
+            useEffect(()=>{
+              axios.get('http://localhost:4875/api/counter')
+                   .then((response)=>{
+                       const data = response.data
+                       setCounters(data)
+                   })
+                   .catch((error)=>{
+                    console.log(error)
+                   })
+
+            },[])
+
+            const handleAddCount = () =>{
+              axios.post('http://localhost:4875/api/counter')
+                   .then((response)=>{
+                      // console.log(response.data)
+                      const newCounter = [...counters,response.data]
+                      setCounters(newCounter)
+                   })
+
+                   .catch((error)=>{
+                      console.log(error)
+                   })
+            }
+
+            const handleDelete = (id) =>{
+              axios.delete(`http://localhost:4875/api/counter/${id}`)
+                   .then((response)=>{
+                       //console.log(response.data)
+                       const newCounters = counters.filter(ele => ele._id != response.data._id)
+                       setCounters(newCounters)
+                   })
+
+
+                   .catch((error)=>{
+                      alert(error.message)
+                   })
+            }
+              return( 
+                <div>
+                  <h1>COUNTER APP</h1> 
+                  <h2> Listing Counters - {counters.length} </h2>
+                  <button onClick={handleAddCount} > Add Counter </button>
+
+                  {counters.map((ele) =>{
+                    return(
+                      <div key={ele._id} >
+                        <h2> {ele.count} </h2>
+                        <button onClick={()=>{
+                          handleDelete(ele._id)
+                        }}> delete </button>
+                        <small>({ele._id})</small>
+                      </div>
+                    )
+                  })}
+
+                </div>
+              )
+           }
+            
+            ReactDOM.render(<App/>,rootHandle)
+           
+        </script>
+    </body>
+</html>
